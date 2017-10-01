@@ -1,7 +1,8 @@
 package com.adventurer.jwtintegration.config;
 
 import com.adventurer.jwtintegration.filter.JWTFilter;
-import com.adventurer.jwtintegration.token.TokenProvider;
+import com.adventurer.jwtintegration.service.AuthenticationService;
+import com.adventurer.jwtintegration.token.TokenService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -18,11 +19,14 @@ import org.springframework.stereotype.Component;
 public class JWTConfigurerAdapter extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
 
     @Autowired
-    private TokenProvider tokenProvider;
+    private TokenService tokenService;
+
+    @Autowired
+    private AuthenticationService authenticationService;
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        JWTFilter customFilter = new JWTFilter(tokenProvider);
+        JWTFilter customFilter = new JWTFilter(tokenService, authenticationService);
         http.addFilterBefore(customFilter, UsernamePasswordAuthenticationFilter.class);
     }
 }
