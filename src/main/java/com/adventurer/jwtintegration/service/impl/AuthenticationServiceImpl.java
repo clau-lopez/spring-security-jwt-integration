@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static com.adventurer.jwtintegration.config.JWTConstants.AUTHORIZATION_HEADER_REFRESH;
+import static com.adventurer.jwtintegration.config.JWTConstants.AUTHORIZATION_HEADER;
 
 /**
  * @Author Claudia López
@@ -44,12 +44,12 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponse refresh(HttpServletRequest request) {
-        return new AuthenticationResponse(tokenService.refreshToken(request.getHeader(AUTHORIZATION_HEADER_REFRESH)));
+        return new AuthenticationResponse(tokenService.refreshToken(request.getHeader(AUTHORIZATION_HEADER)));
     }
 
     @Override
     public boolean validateToken(HttpServletRequest request) {
-        return tokenService.isValidToken(request.getHeader(AUTHORIZATION_HEADER_REFRESH));
+        return tokenService.isValidToken(request.getHeader(AUTHORIZATION_HEADER));
     }
 
     @Override

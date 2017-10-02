@@ -25,10 +25,6 @@ public class AuthenticationController {
     @Autowired
     private AuthenticationService authenticationService;
 
-    @Value("${security.jwt.token.header.refresh}")
-    private String headerRefresh;
-
-
     @ResponseStatus(HttpStatus.OK)
     @PostMapping
     public AuthenticationResponse authenticate(@RequestBody AuthenticationRequest authenticationRequest) throws AuthenticationException, IOException {

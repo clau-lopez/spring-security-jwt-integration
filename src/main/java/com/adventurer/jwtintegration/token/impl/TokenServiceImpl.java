@@ -1,11 +1,14 @@
-package com.adventurer.jwtintegration.token;
+package com.adventurer.jwtintegration.token.impl;
 
+import com.adventurer.jwtintegration.config.JWTSecurityProperties;
+import com.adventurer.jwtintegration.exception.JWTIntegrationException;
+import com.adventurer.jwtintegration.token.TokenService;
 import io.jsonwebtoken.*;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -24,11 +27,8 @@ public class TokenServiceImpl implements TokenService {
 
     private final Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
 
-    @Value("${security.jwt.token.secretkey}")
-    private String secretKey;
-
-    @Value("${security.jwt.token.expiration}")
-    private int expiration;
+    @Autowired
+    private JWTSecurityProperties JWTSecurityProperties;
 
 
     @Override
@@ -54,9 +54,13 @@ public class TokenServiceImpl implements TokenService {
 
     @Override
     public Claims getClaimsFromToken(String token) {
-        return Jwts.parser()
-                .setSigningKey(secretKey)
-                .parseClaimsJws(token).getBody();
+        if (!StringUtils.isBlank(token)) {
+            return Jwts.parser()
+                    .setSigningKey(JWTSecurityProperties.getSecretKey())
+                    .parseClaimsJws(token).getBody();
+        } else {
+            throw new JWTIntegrationException("Token is not valid");
+        }
     }
 
     public boolean isTokenExpired(Date expiration) {
@@ -67,7 +71,7 @@ public class TokenServiceImpl implements TokenService {
         return Jwts.builder()
                 .setClaims(claims)
                 .setExpiration(generateExpirationDate())
-                .signWith(SignatureAlgorithm.HS256, secretKey);
+                .signWith(SignatureAlgorithm.HS256, JWTSecurityProperties.getSecretKey());
     }
 
     private Date getExpirationDateFromToken(String token) {
@@ -75,7 +79,7 @@ public class TokenServiceImpl implements TokenService {
     }
 
     private Date generateExpirationDate() {
-        return new DateTime().plusSeconds(expiration).toDate();
+        return new DateTime().plusSeconds(JWTSecurityProperties.getExpirationDate()).toDate();
     }
 
     private Date getCurrentDate() {
